@@ -1,6 +1,15 @@
 package sk.fullstack.lany.server.model;
 
+import javax.imageio.ImageIO;
 import javax.persistence.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Blob;
+
+import org.hibernate.annotations.ColumnDefault;
+import sun.misc.BASE64Encoder;
 
 /**
  * Class representing Book entity
@@ -28,6 +37,10 @@ public class Book {
 
     private String isbn;
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    private String encodedImg;
+
     public Book() {
     }
 
@@ -37,11 +50,30 @@ public class Book {
         this.isbn = isbn;
     }
 
+
     public Book( String title, String author, String isbn, String plot) {
         this.title = title;
         this.author = author;
         this.isbn = isbn;
         this.plot = plot;
+    }
+
+    public Book( String title, String author, String isbn, String plot, String imgPath) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+        this.plot = plot;
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        try {
+            File input = new File(imgPath);
+            BufferedImage img = ImageIO.read(input);
+            encodedImg = encodeToString(img, "jpg");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public long getId() {
@@ -82,5 +114,23 @@ public class Book {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
+    }
+
+    private String encodeToString(BufferedImage image, String type) {
+        String imageString = null;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        try {
+            ImageIO.write(image, type, bos);
+            byte[] imageBytes = bos.toByteArray();
+
+            BASE64Encoder encoder = new BASE64Encoder();
+            imageString = encoder.encode(imageBytes);
+
+            bos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return imageString;
     }
 }

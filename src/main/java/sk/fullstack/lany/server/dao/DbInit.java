@@ -48,7 +48,7 @@ public class DbInit implements CommandLineRunner {
 
         FileReader input = null;
         try {
-            input = new FileReader("Books.txt");
+            input = new FileReader("BookTestImage.txt");
         } catch (FileNotFoundException e) {
             System.err.println(e);
         }
@@ -61,8 +61,8 @@ public class DbInit implements CommandLineRunner {
                 while ( (myLine = bufRead.readLine()) != null)
                 {
                     String[] data = myLine.split(";");
-                    if (data.length == 4) {
-                        bookRepository.save(new Book(data[0], data[1], data[2], data[3]));
+                    if (data.length == 5) {
+                        bookRepository.save(new Book(data[0], data[1], data[2], data[3], data[4]));
                     }
                 }
             } catch (IOException e) {
